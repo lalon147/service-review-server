@@ -1,8 +1,8 @@
 const express = require('express');
 const cors = require('cors');
-require(`dotenv`).config();
+require("dotenv").config();
 const jwt=require("jsonwebtoken");
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 const app=express()
 const port =process.env.PORT  || 5000;
@@ -51,13 +51,19 @@ const  run=async()=>{
                                 let size=3
                                 if(req.query.size==="all"){
                                    size=count   
-                                }   
-                                
+                                }              
                                 const cursor= serviceCollection.find({})
                                 const services=await cursor.limit(size).toArray()                 
-                                res.send(services)
-                            
-                                
+                                res.send(services)                                
+                             })
+
+
+                             app.get("/services/:id",async(req,res)=>{
+                                const id=req.params.id;
+                                const query={_id:ObjectId(id)}
+                                const result=await serviceCollection.findOne(query)
+                                console.log(result)
+                                res.send(result);
                              })
                              app.post("/jwt",(req,res)=>{
                                 
@@ -69,10 +75,10 @@ const  run=async()=>{
                              
                              app.post("/add-a-service",verifyJwt,async(req,res)=>{
                                 // console.log(req.decoded);
-                                const movie=req.body;
-                                console.log(movie);
-                                const result=await moviesCollection.insertOne(movie);
-                                res.send(movie);
+                                const service=req.body;
+                                console.log(service);
+                                const result=await serviceCollection.insertOne(service);
+                                res.send(result);
                              })
                             
 
@@ -89,5 +95,6 @@ run().catch(error=>console.log(error))
 
 
 app.listen(port,()=>{
+    
     console.log(`SERVER IS RUNNING ON ${port}`)
 } )
