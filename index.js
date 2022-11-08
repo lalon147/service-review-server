@@ -22,7 +22,7 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@clu
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 const database=client.db("food-master");
 const serviceCollection=database.collection("services");
-
+const reviewCollection=database.collection("review");
 
 ///VERIFYING THAT THE USER HAVE THE RIGHT OR AUTHENTIC JSONWEBTOKEN
 const verifyJwt=(req,res,next)=>{
@@ -42,12 +42,13 @@ const verifyJwt=(req,res,next)=>{
         next()
     })
 }
-                   
+ 
+console.log(new Date())
 
 const  run=async()=>{
                          try{
                              app.get("/services",async(req,res)=>{ 
-                                const count=serviceCollection.estimatedDocumentCount();                            
+                                const count=parseInt(serviceCollection.estimatedDocumentCount())                            
                                 let size=3
                                 if(req.query.size==="all"){
                                    size=count   
@@ -59,26 +60,69 @@ const  run=async()=>{
 
 
                              app.get("/services/:id",async(req,res)=>{
-                                const id=req.params.id;
+                                const id=req.params.id;console.log(id);
                                 const query={_id:ObjectId(id)}
                                 const result=await serviceCollection.findOne(query)
                                 console.log(result)
                                 res.send(result);
                              })
-                             app.post("/jwt",(req,res)=>{
-                                
+                             app.post("/jwt",(req,res)=>{                    
                                 const user=req.body;
                                 console.log(user);
                                 const token=jwt.sign(user,process.env.ACCESS_TOKEN,{expiresIn:"1h"})
                                 res.send({token})
                              })
                              
-                             app.post("/add-a-service",verifyJwt,async(req,res)=>{
+                             app.post("/add-a-service",async(req,res)=>{
                                 // console.log(req.decoded);
                                 const service=req.body;
                                 console.log(service);
                                 const result=await serviceCollection.insertOne(service);
                                 res.send(result);
+                             })
+                             app.post("/add-a-review",async(req,res)=>{          
+                             let review=req.body; 
+                              review.added=new Date();         
+                             const result=await reviewCollection.insertOne(review);                            
+                             res.send(result);
+                             })
+                             app.get("/review/:id",async(req,res)=>{
+                                const id=req.params.id;
+                                const sort = { added: -1 };
+                                const cursor=reviewCollection.find({serviceId:id}).sort(sort);
+                                const result=await  cursor.toArray();
+                                res.send(result);
+                             })
+                             app.get("/my-reviews",verifyJwt,async(req,res)=>{
+                                const email=req.query.email;
+                                const sort = { added: -1 };
+                                const cursor=reviewCollection.find({email:email}).sort(sort)
+                                const result=await cursor.toArray()
+                                res.send(result)
+                             })
+                             app.delete("/my-reviews/:id",async(req,res)=>{
+                             
+                               const id=req.params.id;
+                               console.log(id);
+                               
+                               const query={_id:ObjectId(id)}
+                               const result=await reviewCollection.deleteOne(query);
+                               res.send(result);
+
+                             })
+                             app.put("/update-review/:id",async(req,res)=>{
+                               const id=req.params.id;
+                               const review=req.body;
+                               
+                               const query={_id:ObjectId(id)}           
+                               const option ={upsert:true};
+                               const updatedReview={
+                                   $set:{
+                                       message:review.message               
+                                   }
+                               }
+                               const result=await reviewCollection.updateOne(query,updatedReview,option);
+                               res.send(result);
                              })
                             
 
