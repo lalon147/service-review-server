@@ -95,6 +95,7 @@ const  run=async()=>{
                              })
                              app.get("/my-reviews",verifyJwt,async(req,res)=>{
                                 const email=req.query.email;
+                                console.log(email)
                                 const sort = { added: -1 };
                                 const cursor=reviewCollection.find({email:email}).sort(sort)
                                 const result=await cursor.toArray()
