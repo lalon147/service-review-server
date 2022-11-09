@@ -16,6 +16,10 @@ app.use(express.json())
                     res.send("THIS SERVER IS RUNNING")
                    })
 
+                   app.get("/",(req.res)=>{
+                    res.send("HELLO WORLD")
+                   })
+
 
                    //database configaration 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.gw8hef2.mongodb.net/?retryWrites=true&w=majority`;
