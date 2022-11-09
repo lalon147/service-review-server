@@ -16,7 +16,7 @@ app.use(express.json())
                     res.send("THIS SERVER IS RUNNING")
                    })
 
-                   app.get("/",(req.res)=>{
+                   app.get("/",(req,res)=>{
                     res.send("HELLO WORLD")
                    })
 
