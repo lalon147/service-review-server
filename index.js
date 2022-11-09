@@ -34,6 +34,7 @@ const verifyJwt=(req,res,next)=>{
     }
     const token=authHeader.split(" ")[1];
     // console.log(token)
+    //verify ing the token
     jwt.verify(token,process.env.ACCESS_TOKEN,function(err,decoded){
         if(err){
             return res.status(401).send({message:"UNAUTHORIZED ACCESS"})
@@ -138,7 +139,7 @@ run().catch(error=>console.log(error))
 
 
 
-
+//listinig port 
 app.listen(port,()=>{
     
     console.log(`SERVER IS RUNNING ON ${port}`)
