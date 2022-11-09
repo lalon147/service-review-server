@@ -67,7 +67,7 @@ const  run=async()=>{
 
 
                              app.get("/services/:id",async(req,res)=>{
-                                const id=req.params.id;console.log(id);
+                                const id=req.params.id;
                                 const query={_id:ObjectId(id)}
                                 const result=await serviceCollection.findOne(query)
                                 console.log(result)
@@ -75,13 +75,13 @@ const  run=async()=>{
                              })
                              app.post("/jwt",(req,res)=>{                    
                                 const user=req.body;
-                                console.log(user);
+                               
                                 const token=jwt.sign(user,process.env.ACCESS_TOKEN,{expiresIn:"1h"})
                                 res.send({token})
                              })
                              
                              app.post("/add-a-service",async(req,res)=>{
-                                // console.log(req.decoded);
+                             
                                 const service=req.body;
                                 console.log(service);
                                 const result=await serviceCollection.insertOne(service);
@@ -102,7 +102,7 @@ const  run=async()=>{
                              })
                              app.get("/my-reviews",verifyJwt,async(req,res)=>{
                                 const email=req.query.email;
-                                console.log(email)
+                                
                                 const sort = { added: -1 };
                                 const cursor=reviewCollection.find({email:email}).sort(sort)
                                 const result=await cursor.toArray()
@@ -111,7 +111,7 @@ const  run=async()=>{
                              app.delete("/my-reviews/:id",async(req,res)=>{
                              
                                const id=req.params.id;
-                               console.log(id);
+                               
                                
                                const query={_id:ObjectId(id)}
                                const result=await reviewCollection.deleteOne(query);
